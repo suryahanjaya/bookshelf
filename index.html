@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookshelf</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script defer src="main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vanilla-tilt@1.7.2/dist/vanilla-tilt.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div id="datetime-container"></div>
+            <h1><i class="fas fa-book-reader"></i> Bookshelf</h1>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="themeToggle">
+                    <input type="checkbox" id="themeToggle" />
+                    <div class="slider"></div>
+                </label>
+                <span id="theme-label">Mode Gelap</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-book-open"></i>
+                    <h3 id="total-books">0</h3>
+                    <p>Total Buku</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h3 id="incomplete-books">0</h3>
+                    <p>Belum Selesai</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3 id="complete-books">0</h3>
+                    <p>Selesai Dibaca</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <h3 id="favorite-books">0</h3>
+                    <p>Favorit</p>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h2><i class="fas fa-plus-circle"></i> Tambah Buku Baru</h2>
+                    <form id="bookForm" data-testid="bookForm">
+                        <div class="form-group">
+                            <label for="bookFormTitle">Judul</label>
+                            <input id="bookFormTitle" type="text" required data-testid="bookFormTitleInput" />
+                        </div>
+                        <div class="form-group">
+                            <label for="bookFormAuthor">Penulis</label>
+                            <input id="bookFormAuthor" type="text" required data-testid="bookFormAuthorInput" />
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bookFormYear">Tahun</label>
+                                <input id="bookFormYear" type="number" required data-testid="bookFormYearInput" />
+                            </div>
+                            <div class="form-group checkbox-container">
+                                <input id="bookFormIsComplete" type="checkbox" data-testid="bookFormIsCompleteCheckbox" />
+                                <label for="bookFormIsComplete">Selesai dibaca</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn" data-testid="bookFormSubmitButton">
+                            <i class="fas fa-plus"></i> Tambah Buku
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fas fa-search"></i> Cari & Kelola</h2>
+                    <form id="searchBook" data-testid="searchBookForm">
+                        <label for="searchBookTitle">Cari berdasarkan judul</label>
+                        <div class="search-box">
+                            <input id="searchBookTitle" type="text" data-testid="searchBookFormTitleInput" placeholder="Masukkan judul buku..." />
+                            <button type="submit" class="btn" data-testid="searchBookFormSubmitButton">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div style="margin-top: 20px;">
+                        <label>Filter berdasarkan status</label>
+                        <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                            <button class="btn" id="filter-all">Semua</button>
+                            <button class="btn btn-success" id="filter-completed">Selesai</button>
+                            <button class="btn btn-warning" id="filter-incomplete">Belum Selesai</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-toolbar" style="margin-top: 20px;">
+                <h2 class="section-title"><i class="fas fa-layer-group"></i> Rak Buku Anda</h2>
+                <div class="sort-options">
+                    <label for="sortOptions">Urutkan:</label>
+                    <select id="sortOptions">
+                        <option value="default">Default</option>
+                        <option value="title-asc">Judul (A-Z)</option>
+                        <option value="title-desc">Judul (Z-A)</option>
+                        <option value="year-desc">Tahun (Terbaru)</option>
+                        <option value="year-asc">Tahun (Terlama)</option>
+                    </select>
+                </div>
+            </div>
+
+            <h2 class="section-title" id="incomplete-section-title"><i class="fas fa-bookmark"></i> Belum Selesai Dibaca</h2>
+            <div id="incompleteBookList" class="book-shelf" data-testid="incompleteBookList"></div>
+            <h2 class="section-title" id="complete-section-title"><i class="fas fa-trophy"></i> Selesai Dibaca</h2>
+            <div id="completeBookList" class="book-shelf" data-testid="completeBookList"></div>
+        
+            <div class="card" id="analytics-card">
+                <h2><i class="fas fa-chart-bar"></i> Analitik Buku</h2>
+                <canvas id="booksPerYearChart"></canvas>
+            </div>
+        </main>
+    </div>
+    <div class="floating-action" id="scrollToTop" style="display: none;">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    <div class="toast" id="toast"></div>
+    <div class="modal" id="notesModal">
+        <div class="modal-content">
+            <span class="close-modal" data-target="notesModal">&times;</span>
+            <h2><i class="fas fa-sticky-note"></i> Catatan untuk <span id="notesBookTitle"></span></h2>
+            <form id="notesForm">
+                <div class="form-group">
+                    <textarea id="notesTextarea" placeholder="Tulis ulasan atau catatan pribadi Anda di sini..."></textarea>
+                </div>
+                <input type="hidden" id="notesBookId" />
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> Simpan Catatan
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2><i class="fas fa-edit"></i> Edit Buku</h2>
+            <form id="editBookForm">
+                <div class="form-group">
+                    <label for="editBookTitle">Judul</label>
+                    <input id="editBookTitle" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="editBookAuthor">Penulis</label>
+                    <input id="editBookAuthor" type="text" required />
+                </div>
+                <div class="form-group">
+                    <label for="editBookYear">Tahun</label>
+                    <input id="editBookYear" type="number" required />
+                </div>
+                <div class="checkbox-wrapper">
+                    <input id="editBookIsComplete" type="checkbox" />
+                    <label for="editBookIsComplete">Selesai dibaca</label>
+                </div>
+                <input type="hidden" id="editBookId" />
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="confirmation-dialog" id="confirmationDialog">
+        <div class="dialog-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Konfirmasi</h3>
+            <p id="dialogMessage">Apakah Anda yakin ingin menghapus buku ini?</p>
+            <div class="dialog-buttons">
+                <button class="btn" id="dialogCancel">Batal</button>
+                <button class="btn btn-danger" id="dialogConfirm">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+            <footer class="site-footer">
+            <div class="footer-text">
+                &copy; <span id="current-year">2025</span> | Surya Hanjaya
+            </div>
+            <div class="social-links">
+                <a href="https://github.com/suryahanjaya?tab=repositories" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/surya-hanjaya/" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://drive.google.com/file/d/1sPLPMkuu6cJfSdSVdfRHHy1yT4tYEVfr/view?usp=sharing" target="_blank" title="Portfolio"><i class="fas fa-globe"></i></a>
+            </div>
+        </footer>
+        </div> 
+</body>
+</html>
